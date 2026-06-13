@@ -1,0 +1,92 @@
+name: WP Cloud Site Git Deploy
+description: Deploy a Git commit to WP Cloud or Pressable by running the site-side wpcloud-site-git-deploy CLI over SSH.
+
+inputs:
+  host:
+    description: SSH host name.
+    required: true
+  port:
+    description: SSH port.
+    required: false
+    default: "22"
+  username:
+    description: SSH username.
+    required: true
+  password:
+    description: SSH password. Mutually exclusive with private-key.
+    required: false
+    default: ""
+  private-key:
+    description: OpenSSH private key content. Mutually exclusive with password.
+    required: false
+    default: ""
+  private-key-passphrase:
+    description: Optional passphrase for encrypted private-key authentication.
+    required: false
+    default: ""
+  known-hosts:
+    description: Optional known_hosts content. If omitted, ssh-keyscan is used for host key discovery.
+    required: false
+    default: ""
+  docroot:
+    description: Remote document root.
+    required: false
+    default: /srv/htdocs
+  deployment-name:
+    description: Local CLI deployment name stored under the remote site user's HOME.
+    required: false
+    default: site
+  deployment-id:
+    description: Stable public deployment namespace. Defaults to normalized GitHub repository slug.
+    required: false
+    default: ""
+  repo:
+    description: Git repository URL the remote CLI should fetch. Defaults to https://github.com/<owner>/<repo>.git.
+    required: false
+    default: ""
+  commit:
+    description: Exact commit SHA to deploy. Defaults to the workflow run SHA.
+    required: false
+    default: ""
+  default-ref:
+    description: Default ref configured in the remote CLI deployment.
+    required: false
+    default: main
+  keep-releases:
+    description: Number of remote releases to keep.
+    required: false
+    default: "3"
+  cli-ref:
+    description: Ref of aipokalyptik/wpcloud-site-git-deploy to install on the remote site.
+    required: false
+    default: v1
+  post-deploy:
+    description: Newline-delimited Bash commands to run from docroot after deploy. Defaults to WP cache flush commands; set to "none" to disable.
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - name: Run site Git deploy
+      shell: bash
+      env:
+        INPUT_HOST: ${{ inputs.host }}
+        INPUT_PORT: ${{ inputs.port }}
+        INPUT_USERNAME: ${{ inputs.username }}
+        INPUT_PASSWORD: ${{ inputs.password }}
+        INPUT_PRIVATE_KEY: ${{ inputs.private-key }}
+        INPUT_PRIVATE_KEY_PASSPHRASE: ${{ inputs.private-key-passphrase }}
+        INPUT_KNOWN_HOSTS: ${{ inputs.known-hosts }}
+        INPUT_DOCROOT: ${{ inputs.docroot }}
+        INPUT_DEPLOYMENT_NAME: ${{ inputs.deployment-name }}
+        INPUT_DEPLOYMENT_ID: ${{ inputs.deployment-id }}
+        INPUT_REPO: ${{ inputs.repo }}
+        INPUT_COMMIT: ${{ inputs.commit }}
+        INPUT_DEFAULT_REF: ${{ inputs.default-ref }}
+        INPUT_KEEP_RELEASES: ${{ inputs.keep-releases }}
+        INPUT_CLI_REF: ${{ inputs.cli-ref }}
+        INPUT_POST_DEPLOY: ${{ inputs.post-deploy }}
+        INPUT_GITHUB_REPOSITORY: ${{ github.repository }}
+        INPUT_GITHUB_SHA: ${{ github.sha }}
+      run: ${{ github.action_path }}/scripts/deploy.sh

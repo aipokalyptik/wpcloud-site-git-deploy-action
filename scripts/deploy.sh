@@ -349,7 +349,7 @@ install_dir="$HOME/.wpcloud-site-git-deploy/src"
 rm -rf "$install_dir"
 git clone --depth 1 --branch "$cli_ref" "$cli_repo" "$install_dir"
 "$install_dir/scripts/install.sh" >/tmp/wpcloud-site-git-deploy-install.log
-export PATH="$HOME/.wpcloud-site-git-deploy/bin:$PATH"
+export PATH="$HOME/.local/bin:$HOME/.wpcloud-site-git-deploy/bin:$PATH"
 wpcloud-site-git-deploy init "$deployment_name" --repo "$repo" --docroot "$docroot" --deployment-id "$deployment_id" --default-ref "$default_ref" --keep-releases "$keep_releases"
 wpcloud-site-git-deploy deploy "$deployment_name" --commit "$commit"
 if [[ -n "$post_deploy_file" ]]; then

@@ -52,6 +52,12 @@ assert_contains "wp cache flush" "$stderr"
 assert_contains "echo \"y\" | wp edge-cache purge --domain" "$stderr"
 assert_contains "ssh-keyscan -p 22 example.com" "$stderr"
 
+script_tmp="$tmpdir/remote-script"
+WPCLOUD_SITE_GIT_DEPLOY_ACTION_TMPDIR="$script_tmp" \
+WPCLOUD_SITE_GIT_DEPLOY_ACTION_KEEP_TEMP=1 \
+run_deploy "$stdout" "$stderr"
+assert_contains "export PATH=\"\$HOME/.local/bin:\$HOME/.wpcloud-site-git-deploy/bin:\$PATH\"" "$script_tmp/remote-deploy.sh"
+
 INPUT_POST_DEPLOY=none run_deploy "$stdout" "$stderr"
 assert_contains "post_deploy=none" "$stderr"
 assert_not_contains "wp cache flush" "$stderr"
